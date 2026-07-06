@@ -120,6 +120,7 @@ function App(){
   const [modal,setModal]=useState(null);
   const [inviteMode,setInviteMode]=useState("open");
   const [inviteTarget,setInviteTarget]=useState("");
+  const [externalName,setExternalName]=useState("");
   const [authMode,setAuthMode]=useState("login");
   const [form,setForm]=useState({name:"",email:"",password:"",adminCode:""});
   const [authError,setAuthError]=useState("");
@@ -162,7 +163,7 @@ function App(){
   const handleBook=()=>{
     const dateStr=dateKey(dates[selectedDate]);
     if(getBooking(modal.tableNum,dateStr,selectedSlot))return;
-    const nb={id:Date.now().toString(),table:modal.tableNum,date:dateStr,slot:selectedSlot,player1:currentUser.id,player2:inviteMode==="specific"&&inviteTarget?inviteTarget:null,status:"pending",openInvite:inviteMode==="open"};
+    const nb={id:Date.now().toString(),table:modal.tableNum,date:dateStr,slot:selectedSlot,player1:currentUser.id,player2:inviteMode==="specific"&&inviteTarget?inviteTarget:null,externalPartner:inviteMode==="external"&&externalName.trim()?externalName.trim():null,status:inviteMode==="external"&&externalName.trim()?"confirmed":"pending",openInvite:inviteMode==="open"};
     updateBookings([...bookings,nb]);setModal(null);
   };
 
@@ -251,7 +252,7 @@ function App(){
                 <div className="table-label">Tavolo {tableNum} · {labels[state]}</div>
                 {bk&&<div className="table-players">
                   <span className="name">{getUserName(bk.player1)}</span>
-                  {bk.player2?<><br/><span className="name">{getUserName(bk.player2)}</span></>:bk.openInvite?<><br/><span style={{color:"#5c7a63"}}>Posto aperto</span></>:<><br/><span style={{color:"#5c7a63"}}>In attesa risposta</span></>}
+                  {bk.player2?<><br/><span className="name">{getUserName(bk.player2)}</span></>:bk.externalPartner?<><br/><span className="name">{bk.externalPartner}</span><br/><span style={{fontSize:".7rem",color:"#6b7c14"}}>Ospite esterno</span></>:bk.openInvite?<><br/><span style={{color:"#5c7a63"}}>Posto aperto</span></>:<><br/><span style={{color:"#5c7a63"}}>In attesa risposta</span></>}
                 </div>}
                 {state==="free"&&<button className="btn-book">+ Prenota</button>}
                 {canJoin&&<button className="btn-book" onClick={e=>{e.stopPropagation();handleJoin(bk);}}>Unisciti</button>}
@@ -353,6 +354,7 @@ function App(){
         <div className="slot-toggle" style={{marginBottom:14}}>
           <button className={`slot-btn ${inviteMode==="open"?"active":""}`} onClick={()=>setInviteMode("open")}>Posto aperto</button>
           <button className={`slot-btn ${inviteMode==="specific"?"active":""}`} onClick={()=>setInviteMode("specific")}>Invita qualcuno</button>
+          <button className={`slot-btn ${inviteMode==="external"?"active":""}`} onClick={()=>setInviteMode("external")}>Giocatore esterno</button>
         </div>
         {inviteMode==="specific"&&<>
           <label>Scegli il partner</label>
@@ -362,10 +364,15 @@ function App(){
           </select>
           <p style={{fontSize:".78rem",marginTop:-8}}>Il tavolo resterà "In attesa" finché il partner non si unisce.</p>
         </>}
+        {inviteMode==="external"&&<>
+          <label>Nome e cognome del giocatore esterno</label>
+          <input value={externalName} onChange={e=>setExternalName(e.target.value)} placeholder="Es. Marco Bianchi" style={{width:"100%",background:"#0f1a14",border:"1px solid #2a3d2e",borderRadius:8,padding:"10px 12px",color:"#e8f0eb",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
+          <p style={{fontSize:".78rem",marginTop:-8}}>Il nome apparirà sul tavolo ma il giocatore non verrà registrato nell'app.</p>
+        </>}
         {inviteMode==="open"&&<p style={{fontSize:".78rem"}}>Il posto sarà visibile come aperto e chiunque potrà unirsi.</p>}
         <div className="modal-actions">
           <button className="btn-secondary" onClick={()=>setModal(null)}>Annulla</button>
-          <button className="btn-primary" onClick={handleBook} disabled={inviteMode==="specific"&&!inviteTarget}>Conferma</button>
+          <button className="btn-primary" onClick={handleBook} disabled={(inviteMode==="specific"&&!inviteTarget)||(inviteMode==="external"&&!externalName.trim())}>Conferma</button>
         </div>
       </div>
     </div>}
