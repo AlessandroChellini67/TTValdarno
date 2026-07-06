@@ -58,7 +58,6 @@ body{font-family:'Inter',sans-serif;background:#0f1a14;color:#e8f0eb;min-height:
 .modal h2{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#4cde80;margin-bottom:16px}
 .modal p{font-size:.88rem;color:#9dbfa8;margin-bottom:16px}
 .modal label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#5c7a63;margin-bottom:6px}
-.modal input,.modal select{width:100%;background:#0f1a14;border:1px solid #2a3d2e;border-radius:8px;padding:10px 12px;color:#e8f0eb;font-size:.9rem;margin-bottom:14px;outline:none;font-family:'Inter',sans-serif}
 .modal-actions{display:flex;gap:8px;margin-top:4px}
 .btn-primary{flex:1;background:#4cde80;color:#0f1a14;border:none;border-radius:10px;padding:12px;font-size:.9rem;font-weight:700;cursor:pointer}
 .btn-secondary{flex:1;background:none;color:#9dbfa8;border:1px solid #2a3d2e;border-radius:10px;padding:12px;font-size:.9rem;font-weight:600;cursor:pointer}
@@ -86,20 +85,31 @@ body{font-family:'Inter',sans-serif;background:#0f1a14;color:#e8f0eb;min-height:
 .badge-mine{background:#0a1f30;color:#4cbdde}
 .btn-danger{background:none;border:1px solid #5c2a2a;color:#de4c4c;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer}
 .pending-badge{position:absolute;top:10px;right:10px;font-size:.65rem;font-weight:700;background:#6b7c14;color:#0f1a14;border-radius:999px;padding:2px 7px}
+.loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#4cde80;font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect} = React;
+const {useState,useEffect,useCallback}=React;
 
+const BIN_ID="6a4ba2c3da38895dfe34fd25";
+const API_KEY="$2a$10$Dsd10Ss03WuXZKAwXqVyAO/82xnFc6gAy/Ulugmgdyp9h4ajp20aK";
+const BASE_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 const TABLES=[1,2,3,4,5];
 const SLOTS=["17:00–18:30","18:30–20:00"];
 const ADMIN_CODE="TTV";
 const DEFAULT_ADMIN={id:"admin-alessandro",name:"Alessandro",email:"alessandro.chellini7@gmail.com",password:"Tacchino",isAdmin:true};
 
-function load(key){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null;}catch{return null;}}
-function save(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch{}}
+async function fetchData(){
+  const r=await fetch(BASE_URL+"/latest",{headers:{"X-Master-Key":API_KEY}});
+  const j=await r.json();
+  return j.record;
+}
+
+async function saveData(data){
+  await fetch(BASE_URL,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":API_KEY},body:JSON.stringify(data)});
+}
 
 function getUpcomingDates(){
   const dates=[];const today=new Date();today.setHours(0,0,0,0);
@@ -111,8 +121,9 @@ function formatDate(date){return date.toLocaleDateString("it-IT",{weekday:"long"
 function dateKey(date){return date.toISOString().slice(0,10);}
 
 function App(){
-  const [users,setUsers]=useState([]);
-  const [bookings,setBookings]=useState([]);
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [saving,setSaving]=useState(false);
   const [currentUser,setCurrentUser]=useState(null);
   const [tab,setTab]=useState("prenota");
   const [selectedDate,setSelectedDate]=useState(0);
@@ -127,55 +138,75 @@ function App(){
   const dates=getUpcomingDates();
 
   useEffect(()=>{
-    let u=load("tt_users")||[];
-    if(!u.find(x=>x.id===DEFAULT_ADMIN.id))u=[DEFAULT_ADMIN,...u];
-    save("tt_users",u);
-    setUsers(u);
-    setBookings(load("tt_bookings")||[]);
-    const cu=load("tt_currentUser");
-    setCurrentUser(cu||null);
+    const cu=localStorage.getItem("tt_currentUser");
+    if(cu)setCurrentUser(JSON.parse(cu));
+    fetchData().then(d=>{
+      if(!d.users)d.users=[];
+      if(!d.bookings)d.bookings=[];
+      if(!d.users.find(u=>u.id===DEFAULT_ADMIN.id)){
+        d.users=[DEFAULT_ADMIN,...d.users];
+        saveData(d);
+      }
+      setData(d);
+      setLoading(false);
+    }).catch(()=>setLoading(false));
   },[]);
 
-  const updateUsers=u=>{setUsers(u);save("tt_users",u);};
-  const updateBookings=b=>{setBookings(b);save("tt_bookings",b);};
-  const updateCurrentUser=u=>{setCurrentUser(u);save("tt_currentUser",u);};
+  const updateData=async(newData)=>{
+    setSaving(true);
+    setData(newData);
+    await saveData(newData);
+    setSaving(false);
+  };
 
-  const handleAuth=()=>{
+  const users=data?.users||[];
+  const bookings=data?.bookings||[];
+
+  const handleAuth=async()=>{
     setAuthError("");
     if(authMode==="register"){
       if(!form.name.trim()||!form.email.trim()||!form.password.trim()){setAuthError("Compila tutti i campi.");return;}
       if(users.find(u=>u.email===form.email.trim().toLowerCase())){setAuthError("Email già registrata.");return;}
       const isAdmin=form.adminCode===ADMIN_CODE;
       const newUser={id:Date.now().toString(),name:form.name.trim(),email:form.email.trim().toLowerCase(),password:form.password,isAdmin};
-      const newUsers=[...users,newUser];
-      updateUsers(newUsers);updateCurrentUser(newUser);
+      const newData={...data,users:[...users,newUser]};
+      await updateData(newData);
+      localStorage.setItem("tt_currentUser",JSON.stringify(newUser));
+      setCurrentUser(newUser);
     }else{
       const found=users.find(u=>u.email===form.email.trim().toLowerCase()&&u.password===form.password);
       if(!found){setAuthError("Email o password errati.");return;}
-      updateCurrentUser(found);
+      localStorage.setItem("tt_currentUser",JSON.stringify(found));
+      setCurrentUser(found);
     }
   };
 
-  const handleLogout=()=>{updateCurrentUser(null);setTab("prenota");};
+  const handleLogout=()=>{localStorage.removeItem("tt_currentUser");setCurrentUser(null);setTab("prenota");};
   const getBooking=(t,d,s)=>bookings.find(b=>b.table===t&&b.date===d&&b.slot===s);
   const getUserName=id=>{if(!id)return null;const u=users.find(x=>x.id===id);return u?u.name:"Utente";};
 
-  const handleBook=()=>{
+  const handleBook=async()=>{
     const dateStr=dateKey(dates[selectedDate]);
     if(getBooking(modal.tableNum,dateStr,selectedSlot))return;
     const nb={id:Date.now().toString(),table:modal.tableNum,date:dateStr,slot:selectedSlot,player1:currentUser.id,player2:inviteMode==="specific"&&inviteTarget?inviteTarget:null,externalPartner:inviteMode==="external"&&externalName.trim()?externalName.trim():null,status:inviteMode==="external"&&externalName.trim()?"confirmed":"pending",openInvite:inviteMode==="open"};
-    updateBookings([...bookings,nb]);setModal(null);
+    await updateData({...data,bookings:[...bookings,nb]});
+    setModal(null);setInviteMode("open");setInviteTarget("");setExternalName("");
   };
 
-  const handleJoin=bk=>{
-    updateBookings(bookings.map(b=>b.id===bk.id?{...b,player2:currentUser.id,status:"confirmed",openInvite:false}:b));
+  const handleJoin=async(bk)=>{
+    const newBookings=bookings.map(b=>b.id===bk.id?{...b,player2:currentUser.id,status:"confirmed",openInvite:false}:b);
+    await updateData({...data,bookings:newBookings});
   };
 
-  const handleCancel=bookingId=>{
+  const handleCancel=async(bookingId)=>{
     const b=bookings.find(x=>x.id===bookingId);if(!b)return;
-    if(b.player2===currentUser.id){updateBookings(bookings.map(x=>x.id===bookingId?{...x,player2:null,status:"pending",openInvite:true}:x));}
-    else{updateBookings(bookings.filter(x=>x.id!==bookingId));}
+    let newBookings;
+    if(b.player2===currentUser.id){newBookings=bookings.map(x=>x.id===bookingId?{...x,player2:null,status:"pending",openInvite:true}:x);}
+    else{newBookings=bookings.filter(x=>x.id!==bookingId);}
+    await updateData({...data,bookings:newBookings});
   };
+
+  if(loading)return <div className="loading">Caricamento…</div>;
 
   if(!currentUser){
     return(
@@ -209,6 +240,7 @@ function App(){
 
   return(
     <>
+    {saving&&<div style={{position:"fixed",top:0,left:0,right:0,background:"#4cde80",color:"#0f1a14",textAlign:"center",padding:"6px",fontSize:".8rem",fontWeight:700,zIndex:200}}>Salvataggio…</div>}
     <div className="app">
       <div className="header">
         <div className="logo">TT<span> Valdarno</span></div>
@@ -252,7 +284,10 @@ function App(){
                 <div className="table-label">Tavolo {tableNum} · {labels[state]}</div>
                 {bk&&<div className="table-players">
                   <span className="name">{getUserName(bk.player1)}</span>
-                  {bk.player2?<><br/><span className="name">{getUserName(bk.player2)}</span></>:bk.externalPartner?<><br/><span className="name">{bk.externalPartner}</span><br/><span style={{fontSize:".7rem",color:"#6b7c14"}}>Ospite esterno</span></>:bk.openInvite?<><br/><span style={{color:"#5c7a63"}}>Posto aperto</span></>:<><br/><span style={{color:"#5c7a63"}}>In attesa risposta</span></>}
+                  {bk.player2?<><br/><span className="name">{getUserName(bk.player2)}</span></>
+                  :bk.externalPartner?<><br/><span className="name">{bk.externalPartner}</span><br/><span style={{fontSize:".7rem",color:"#6b7c14"}}>Ospite esterno</span></>
+                  :bk.openInvite?<><br/><span style={{color:"#5c7a63"}}>Posto aperto</span></>
+                  :<><br/><span style={{color:"#5c7a63"}}>In attesa risposta</span></>}
                 </div>}
                 {state==="free"&&<button className="btn-book">+ Prenota</button>}
                 {canJoin&&<button className="btn-book" onClick={e=>{e.stopPropagation();handleJoin(bk);}}>Unisciti</button>}
@@ -270,11 +305,12 @@ function App(){
           {myBookings.map(b=>{
             const d=new Date(b.date+"T12:00:00");
             const partner=b.player1===currentUser.id?b.player2:b.player1;
+            const partnerName=b.externalPartner||(partner?getUserName(partner):null);
             return(<div key={b.id} className="booking-row">
               <div className="info">
                 <strong>Tavolo {b.table} · {SLOTS[b.slot]}</strong>
                 {formatDate(d)}<br/>
-                {partner?<>Partner: <strong style={{color:"#e8f0eb"}}>{getUserName(partner)}</strong></>:b.openInvite?"Posto aperto":"In attesa risposta"}
+                {partnerName?<>Partner: <strong style={{color:"#e8f0eb"}}>{partnerName}</strong></>:b.openInvite?"Posto aperto":"In attesa risposta"}
                 <span style={{marginLeft:8}} className={`badge badge-${b.status==="confirmed"?"mine":"pending"}`}>{b.status==="confirmed"?"Confermata":"In attesa"}</span>
               </div>
               <button className="btn-danger" onClick={()=>handleCancel(b.id)}>Cancella</button>
@@ -288,8 +324,7 @@ function App(){
         <div className="my-bookings-list">
           {otherUsers.filter(u=>!u.isAdmin).map(u=>{
             const hasPlayed=bookings.some(b=>b.status==="confirmed"&&((b.player1===currentUser.id&&b.player2===u.id)||(b.player2===currentUser.id&&b.player1===u.id)));
-            const userBookings=bookings.filter(b=>(b.player1===u.id||b.player2===u.id)&&b.status!=="cancelled");
-            const futureBookings=userBookings.filter(b=>new Date(b.date+"T23:59:00")>=new Date());
+            const futureBookings=bookings.filter(b=>(b.player1===u.id||b.player2===u.id)&&new Date(b.date+"T23:59:00")>=new Date());
             return(
               <div key={u.id} className="booking-row" style={{flexDirection:"column",alignItems:"flex-start",gap:8}}>
                 <div style={{display:"flex",justifyContent:"space-between",width:"100%",alignItems:"center"}}>
@@ -299,13 +334,11 @@ function App(){
                 {futureBookings.length>0?(
                   <div style={{fontSize:".78rem",color:"#5c7a63",width:"100%"}}>
                     <div style={{marginBottom:4,color:"#9dbfa8",fontWeight:600}}>Prossimi allenamenti:</div>
-                    {futureBookings.slice(0,3).map(b=>{
-                      const partner=b.player1===u.id?b.player2:b.player1;
-                      return(<div key={b.id} style={{padding:"4px 0",borderBottom:"1px solid #1a2b20"}}>
+                    {futureBookings.slice(0,3).map(b=>(
+                      <div key={b.id} style={{padding:"4px 0",borderBottom:"1px solid #1a2b20"}}>
                         🏓 Tavolo {b.table} · {SLOTS[b.slot]} · {new Date(b.date+"T12:00:00").toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"})}
-                        {partner&&<span style={{color:"#4cde80"}}> con {getUserName(partner)}</span>}
-                      </div>);
-                    })}
+                      </div>
+                    ))}
                   </div>
                 ):<div style={{fontSize:".78rem",color:"#3a5040"}}>Nessun allenamento prenotato</div>}
               </div>
@@ -324,7 +357,7 @@ function App(){
             <tr key={u.id}>
               <td><strong>{u.name}</strong></td><td>{u.email}</td>
               <td><span className={`badge badge-${u.isAdmin?"mine":"free"}`}>{u.isAdmin?"Admin":"Membro"}</span></td>
-              <td>{u.id!==currentUser.id&&<button className="btn-danger" onClick={()=>{updateUsers(users.filter(x=>x.id!==u.id));updateBookings(bookings.filter(b=>b.player1!==u.id&&b.player2!==u.id));}}>Rimuovi</button>}</td>
+              <td>{u.id!==currentUser.id&&<button className="btn-danger" onClick={async()=>{const newData={...data,users:users.filter(x=>x.id!==u.id),bookings:bookings.filter(b=>b.player1!==u.id&&b.player2!==u.id)};await updateData(newData);}}>Rimuovi</button>}</td>
             </tr>
           ))}</tbody>
         </table>
@@ -337,9 +370,9 @@ function App(){
               <td><strong>{b.table}</strong></td>
               <td>{new Date(b.date+"T12:00:00").toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}</td>
               <td>{SLOTS[b.slot]}</td>
-              <td>{getUserName(b.player1)}{b.player2?" · "+getUserName(b.player2):" · —"}</td>
+              <td>{getUserName(b.player1)}{b.externalPartner?" · "+b.externalPartner:b.player2?" · "+getUserName(b.player2):" · —"}</td>
               <td><span className={`badge badge-${b.status==="confirmed"?"mine":"pending"}`}>{b.status==="confirmed"?"Confermata":"In attesa"}</span></td>
-              <td><button className="btn-danger" onClick={()=>updateBookings(bookings.filter(x=>x.id!==b.id))}>Cancella</button></td>
+              <td><button className="btn-danger" onClick={async()=>{await updateData({...data,bookings:bookings.filter(x=>x.id!==b.id)});}}>Cancella</button></td>
             </tr>
           ))}</tbody>
         </table>}
@@ -351,10 +384,10 @@ function App(){
         <h2>Prenota Tavolo {modal.tableNum}</h2>
         <p>{formatDate(dates[selectedDate])} · {SLOTS[selectedSlot]}</p>
         <label>Come vuoi giocare?</label>
-        <div className="slot-toggle" style={{marginBottom:14}}>
+        <div className="slot-toggle" style={{marginBottom:14,flexWrap:"wrap"}}>
           <button className={`slot-btn ${inviteMode==="open"?"active":""}`} onClick={()=>setInviteMode("open")}>Posto aperto</button>
           <button className={`slot-btn ${inviteMode==="specific"?"active":""}`} onClick={()=>setInviteMode("specific")}>Invita qualcuno</button>
-          <button className={`slot-btn ${inviteMode==="external"?"active":""}`} onClick={()=>setInviteMode("external")}>Giocatore esterno</button>
+          <button className={`slot-btn ${inviteMode==="external"?"active":""}`} onClick={()=>setInviteMode("external")} style={{marginTop:8}}>Giocatore esterno</button>
         </div>
         {inviteMode==="specific"&&<>
           <label>Scegli il partner</label>
@@ -367,7 +400,7 @@ function App(){
         {inviteMode==="external"&&<>
           <label>Nome e cognome del giocatore esterno</label>
           <input value={externalName} onChange={e=>setExternalName(e.target.value)} placeholder="Es. Marco Bianchi" style={{width:"100%",background:"#0f1a14",border:"1px solid #2a3d2e",borderRadius:8,padding:"10px 12px",color:"#e8f0eb",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
-          <p style={{fontSize:".78rem",marginTop:-8}}>Il nome apparirà sul tavolo ma il giocatore non verrà registrato nell'app.</p>
+          <p style={{fontSize:".78rem",marginTop:-8}}>Il nome apparirà sul tavolo ma non verrà registrato nell'app.</p>
         </>}
         {inviteMode==="open"&&<p style={{fontSize:".78rem"}}>Il posto sarà visibile come aperto e chiunque potrà unirsi.</p>}
         <div className="modal-actions">
