@@ -203,13 +203,15 @@ function App(){
 
   const handleLogout=()=>{localStorage.removeItem("tt_currentUser");setCurrentUser(null);setTab("prenota");};
 
-  const handleSaveProfile=async()=>{
-    if(!editName.trim())return;
-    // Leggo i dati freschi da JSONBin prima di salvare
+  const handleSaveProfile=async(nameToSave)=>{
+    if(!nameToSave||!nameToSave.trim())return;
+    const trimmedName=nameToSave.trim();
     const freshData=await fetchData();
-    const updatedUser={...currentUser,name:editName.trim()};
+    const updatedUser={id:currentUser.id,name:trimmedName,email:currentUser.email,password:currentUser.password,isAdmin:currentUser.isAdmin};
     const newUsers=freshData.users.map(u=>u.id===currentUser.id?updatedUser:u);
-    const nd={...freshData,users:newUsers};
+    if(!newUsers.find(u=>u.id===currentUser.id))newUsers.push(updatedUser);
+    const nd={bookings:freshData.bookings||[],users:newUsers};
+    console.log("Saving name:",trimmedName,"Full data:",JSON.stringify(nd));
     await saveData(nd);
     setData(nd);
     localStorage.setItem("tt_currentUser",JSON.stringify(updatedUser));
@@ -435,7 +437,7 @@ function App(){
         <input value={editName} onChange={e=>setEditName(e.target.value)} style={{width:"100%",background:"#070d1f",border:"1px solid #1a2d50",borderRadius:8,padding:"10px 12px",color:"#e8f0ff",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
         <div className="modal-actions">
           <button className="btn-secondary" onClick={()=>setProfileModal(false)}>Annulla</button>
-          <button className="btn-primary" onClick={handleSaveProfile} disabled={!editName.trim()}>Salva</button>
+          <button className="btn-primary" onClick={()=>handleSaveProfile(editName)} disabled={!editName.trim()}>Salva</button>
         </div>
       </div>
     </div>}
