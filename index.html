@@ -205,13 +205,15 @@ function App(){
 
   const handleSaveProfile=async()=>{
     if(!editName.trim())return;
+    // Leggo i dati freschi da JSONBin prima di salvare
+    const freshData=await fetchData();
     const updatedUser={...currentUser,name:editName.trim()};
-    const newUsers=users.map(u=>u.id===currentUser.id?updatedUser:u);
-    const nd={...data,users:newUsers};
+    const newUsers=freshData.users.map(u=>u.id===currentUser.id?updatedUser:u);
+    const nd={...freshData,users:newUsers};
+    await saveData(nd);
     setData(nd);
     localStorage.setItem("tt_currentUser",JSON.stringify(updatedUser));
     setCurrentUser(updatedUser);
-    await saveData(nd);
     setProfileModal(false);
   };
 
