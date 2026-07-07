@@ -10,82 +10,82 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#0f1a14;color:#e8f0eb;min-height:100vh}
+body{font-family:'Inter',sans-serif;background:#070d1f;color:#e8f0ff;min-height:100vh}
 .app{max-width:960px;margin:0 auto;padding:0 16px 80px}
-.header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid #1e3028}
-.logo{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:#4cde80;letter-spacing:.5px}
-.logo span{color:#e8f0eb}
-.user-pill{display:flex;align-items:center;gap:10px;background:#1a2b20;border-radius:999px;padding:6px 14px 6px 10px;font-size:.82rem;color:#9dbfa8}
-.dot{width:8px;height:8px;border-radius:50%;background:#4cde80}
-.btn-logout{background:none;border:1px solid #2a3d2e;color:#9dbfa8;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer}
-.btn-logout:hover{border-color:#4cde80;color:#4cde80}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid #121e3d}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:#2d7dd2;letter-spacing:.5px}
+.logo span{color:#e8f0ff}
+.user-pill{display:flex;align-items:center;gap:10px;background:#0d1a35;border-radius:999px;padding:6px 14px 6px 10px;font-size:.82rem;color:#8ab0d4}
+.dot{width:8px;height:8px;border-radius:50%;background:#2d7dd2}
+.btn-logout{background:none;border:1px solid #1a2d50;color:#8ab0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer}
+.btn-logout:hover{border-color:#2d7dd2;color:#2d7dd2}
 .tabs{display:flex;gap:4px;padding:16px 0 0}
-.tab{background:none;border:none;padding:8px 18px;border-radius:8px 8px 0 0;font-size:.88rem;font-weight:600;color:#5c7a63;cursor:pointer;border-bottom:2px solid transparent}
-.tab.active{color:#4cde80;border-bottom-color:#4cde80}
+.tab{background:none;border:none;padding:8px 18px;border-radius:8px 8px 0 0;font-size:.88rem;font-weight:600;color:#4a6a8a;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#2d7dd2;border-bottom-color:#2d7dd2}
 .date-strip{display:flex;gap:8px;overflow-x:auto;padding:16px 0 8px;scrollbar-width:none}
 .date-strip::-webkit-scrollbar{display:none}
-.date-btn{flex-shrink:0;background:#1a2b20;border:1px solid #2a3d2e;border-radius:10px;padding:8px 14px;cursor:pointer;text-align:center}
-.date-btn .day-name{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:#5c7a63;font-weight:600}
-.date-btn .day-num{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:#9dbfa8;line-height:1.1}
-.date-btn.active{background:#4cde80;border-color:#4cde80}
-.date-btn.active .day-name,.date-btn.active .day-num{color:#0f1a14}
+.date-btn{flex-shrink:0;background:#0d1a35;border:1px solid #1a2d50;border-radius:10px;padding:8px 14px;cursor:pointer;text-align:center}
+.date-btn .day-name{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:#4a6a8a;font-weight:600}
+.date-btn .day-num{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:#8ab0d4;line-height:1.1}
+.date-btn.active{background:#2d7dd2;border-color:#2d7dd2}
+.date-btn.active .day-name,.date-btn.active .day-num{color:#070d1f}
 .slot-toggle{display:flex;gap:8px;margin:12px 0}
-.slot-btn{flex:1;padding:10px;border:1px solid #2a3d2e;border-radius:8px;background:#1a2b20;color:#5c7a63;font-size:.88rem;font-weight:600;cursor:pointer}
-.slot-btn.active{background:#1a3d28;border-color:#4cde80;color:#4cde80}
+.slot-btn{flex:1;padding:10px;border:1px solid #1a2d50;border-radius:8px;background:#0d1a35;color:#4a6a8a;font-size:.88rem;font-weight:600;cursor:pointer}
+.slot-btn.active{background:#0d2a4d;border-color:#2d7dd2;color:#2d7dd2}
 .table-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:8px}
-.table-card{border-radius:14px;padding:18px 16px;border:1.5px solid #2a3d2e;transition:all .2s;position:relative}
-.table-card.free{background:#0f1a14;border-color:#2d5c3c;cursor:pointer}
-.table-card.free:hover{border-color:#4cde80;transform:translateY(-2px);box-shadow:0 8px 24px #4cde8022}
+.table-card{border-radius:14px;padding:18px 16px;border:1.5px solid #1a2d50;transition:all .2s;position:relative}
+.table-card.free{background:#070d1f;border-color:#1a3d7a;cursor:pointer}
+.table-card.free:hover{border-color:#2d7dd2;transform:translateY(-2px);box-shadow:0 8px 24px #2d7dd222}
 .table-card.pending{background:#1a2208;border-color:#6b7c14}
 .table-card.full{background:#1a0e0e;border-color:#5c2a2a}
-.table-card.mine{background:#0a1f30;border-color:#2a7a9d}
+.table-card.mine{background:#0a1535;border-color:#2a7a9d}
 .table-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
-.table-card.free .table-num{color:#4cde80}
+.table-card.free .table-num{color:#2d7dd2}
 .table-card.pending .table-num{color:#c9d11c}
 .table-card.full .table-num{color:#de4c4c}
 .table-card.mine .table-num{color:#4cbdde}
 .table-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
-.table-card.free .table-label{color:#3a8a50}
+.table-card.free .table-label{color:#1a5fa0}
 .table-card.pending .table-label{color:#8a8a1a}
 .table-card.full .table-label{color:#8a3a3a}
 .table-card.mine .table-label{color:#2a7a9d}
-.table-players{font-size:.8rem;color:#9dbfa8;line-height:1.4}
-.table-players .name{font-weight:600;color:#e8f0eb}
-.btn-book{margin-top:10px;width:100%;background:#4cde80;color:#0f1a14;border:none;border-radius:8px;padding:8px;font-size:.82rem;font-weight:700;cursor:pointer}
+.table-players{font-size:.8rem;color:#8ab0d4;line-height:1.4}
+.table-players .name{font-weight:600;color:#e8f0ff}
+.btn-book{margin-top:10px;width:100%;background:#2d7dd2;color:#070d1f;border:none;border-radius:8px;padding:8px;font-size:.82rem;font-weight:700;cursor:pointer}
 .btn-cancel{margin-top:10px;width:100%;background:none;color:#de4c4c;border:1px solid #5c2a2a;border-radius:8px;padding:8px;font-size:.82rem;font-weight:700;cursor:pointer}
 .overlay{position:fixed;inset:0;background:#00000099;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
-.modal{background:#141f18;border:1px solid #2a3d2e;border-radius:18px;padding:28px 24px;width:100%;max-width:420px}
-.modal h2{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#4cde80;margin-bottom:16px}
-.modal p{font-size:.88rem;color:#9dbfa8;margin-bottom:16px}
-.modal label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#5c7a63;margin-bottom:6px}
+.modal{background:#0d1530;border:1px solid #1a2d50;border-radius:18px;padding:28px 24px;width:100%;max-width:420px}
+.modal h2{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#2d7dd2;margin-bottom:16px}
+.modal p{font-size:.88rem;color:#8ab0d4;margin-bottom:16px}
+.modal label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#4a6a8a;margin-bottom:6px}
 .modal-actions{display:flex;gap:8px;margin-top:4px}
-.btn-primary{flex:1;background:#4cde80;color:#0f1a14;border:none;border-radius:10px;padding:12px;font-size:.9rem;font-weight:700;cursor:pointer}
-.btn-secondary{flex:1;background:none;color:#9dbfa8;border:1px solid #2a3d2e;border-radius:10px;padding:12px;font-size:.9rem;font-weight:600;cursor:pointer}
+.btn-primary{flex:1;background:#2d7dd2;color:#070d1f;border:none;border-radius:10px;padding:12px;font-size:.9rem;font-weight:700;cursor:pointer}
+.btn-secondary{flex:1;background:none;color:#8ab0d4;border:1px solid #1a2d50;border-radius:10px;padding:12px;font-size:.9rem;font-weight:600;cursor:pointer}
 .auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-.auth-card{background:#141f18;border:1px solid #2a3d2e;border-radius:18px;padding:28px 24px;width:100%;max-width:380px}
-.auth-card h2{font-size:1.1rem;font-weight:700;color:#e8f0eb;margin-bottom:20px}
-.field-label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#5c7a63;margin-bottom:6px}
-.field-input{width:100%;background:#0f1a14;border:1px solid #2a3d2e;border-radius:8px;padding:10px 12px;color:#e8f0eb;font-size:.9rem;margin-bottom:14px;outline:none;font-family:'Inter',sans-serif}
+.auth-card{background:#0d1530;border:1px solid #1a2d50;border-radius:18px;padding:28px 24px;width:100%;max-width:380px}
+.auth-card h2{font-size:1.1rem;font-weight:700;color:#e8f0ff;margin-bottom:20px}
+.field-label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#4a6a8a;margin-bottom:6px}
+.field-input{width:100%;background:#070d1f;border:1px solid #1a2d50;border-radius:8px;padding:10px 12px;color:#e8f0ff;font-size:.9rem;margin-bottom:14px;outline:none;font-family:'Inter',sans-serif}
 .error-msg{background:#2a0a0a;border:1px solid #5c2a2a;border-radius:8px;padding:10px 12px;font-size:.82rem;color:#de4c4c;margin-bottom:14px}
-.section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:#5c7a63;font-weight:600;margin:20px 0 8px}
-.empty-state{text-align:center;padding:40px 20px;color:#3a5040;font-size:.9rem}
+.section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:#4a6a8a;font-weight:600;margin:20px 0 8px}
+.empty-state{text-align:center;padding:40px 20px;color:#2a3d5a;font-size:.9rem}
 .my-bookings-list{display:flex;flex-direction:column;gap:10px}
-.booking-row{background:#141f18;border:1px solid #2a3d2e;border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.booking-row .info{font-size:.82rem;color:#9dbfa8}
-.booking-row .info strong{color:#e8f0eb;display:block;font-size:.9rem}
+.booking-row{background:#0d1530;border:1px solid #1a2d50;border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.booking-row .info{font-size:.82rem;color:#8ab0d4}
+.booking-row .info strong{color:#e8f0ff;display:block;font-size:.9rem}
 .admin-section{margin-top:20px}
-.admin-section h3{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;color:#4cde80;margin-bottom:12px}
+.admin-section h3{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;color:#2d7dd2;margin-bottom:12px}
 .admin-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.admin-table th{text-align:left;padding:8px 10px;color:#5c7a63;font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #1e3028}
-.admin-table td{padding:10px;border-bottom:1px solid #1a2b20;color:#9dbfa8}
-.admin-table td strong{color:#e8f0eb}
+.admin-table th{text-align:left;padding:8px 10px;color:#4a6a8a;font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #121e3d}
+.admin-table td{padding:10px;border-bottom:1px solid #0d1a35;color:#8ab0d4}
+.admin-table td strong{color:#e8f0ff}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:700}
-.badge-free{background:#0a2a14;color:#4cde80}
+.badge-free{background:#0a1a3d;color:#2d7dd2}
 .badge-pending{background:#1a2208;color:#c9d11c}
-.badge-mine{background:#0a1f30;color:#4cbdde}
+.badge-mine{background:#0a1535;color:#4cbdde}
 .btn-danger{background:none;border:1px solid #5c2a2a;color:#de4c4c;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer}
-.pending-badge{position:absolute;top:10px;right:10px;font-size:.65rem;font-weight:700;background:#6b7c14;color:#0f1a14;border-radius:999px;padding:2px 7px}
-.loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#4cde80;font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800}
+.pending-badge{position:absolute;top:10px;right:10px;font-size:.65rem;font-weight:700;background:#6b7c14;color:#070d1f;border-radius:999px;padding:2px 7px}
+.loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#2d7dd2;font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800}
 </style>
 </head>
 <body>
@@ -216,8 +216,8 @@ function App(){
   if(!currentUser){
     return(
       <div className="auth-wrap">
-        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:"2.4rem",fontWeight:800,color:"#4cde80",marginBottom:4}}>TT<span style={{color:"#e8f0eb"}}> Valdarno</span></div>
-        <div style={{fontSize:".88rem",color:"#5c7a63",marginBottom:32,textAlign:"center"}}>Prenotazioni tavoli — Tennistavolo</div>
+        <img src="https://raw.githubusercontent.com/AlessandroChellini67/TTValdarno/main/d4w2I.jpg" style={{width:180,borderRadius:16,marginBottom:24,boxShadow:"0 8px 32px #2d7dd244"}} alt="TT Valdarno"/>
+        <div style={{fontSize:".88rem",color:"#4a6a8a",marginBottom:32,textAlign:"center"}}>Prenotazioni tavoli — Tennistavolo</div>
         <div className="auth-card">
           <h2>{authMode==="login"?"Accedi":"Registrati"}</h2>
           {authError&&<div className="error-msg">{authError}</div>}
@@ -228,9 +228,9 @@ function App(){
           <input className="field-input" type="password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}/>
           {authMode==="register"&&<><label className="field-label">Codice admin (opzionale)</label><input className="field-input" value={form.adminCode} onChange={e=>setForm(f=>({...f,adminCode:e.target.value}))} placeholder="Solo se sei il gestore"/></>}
           <button className="btn-primary" style={{width:"100%",marginTop:4}} onClick={handleAuth}>{authMode==="login"?"Entra":"Crea account"}</button>
-          <div style={{textAlign:"center",marginTop:16,fontSize:".82rem",color:"#5c7a63"}}>
+          <div style={{textAlign:"center",marginTop:16,fontSize:".82rem",color:"#4a6a8a"}}>
             {authMode==="login"?"Non hai un account? ":"Hai già un account? "}
-            <button onClick={()=>setAuthMode(authMode==="login"?"register":"login")} style={{background:"none",border:"none",color:"#4cde80",fontSize:".82rem",fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>
+            <button onClick={()=>setAuthMode(authMode==="login"?"register":"login")} style={{background:"none",border:"none",color:"#2d7dd2",fontSize:".82rem",fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>
               {authMode==="login"?"Registrati":"Accedi"}
             </button>
           </div>
@@ -245,10 +245,10 @@ function App(){
 
   return(
     <>
-    {saving&&<div style={{position:"fixed",top:0,left:0,right:0,background:"#4cde80",color:"#0f1a14",textAlign:"center",padding:"6px",fontSize:".8rem",fontWeight:700,zIndex:200}}>Salvataggio…</div>}
+    {saving&&<div style={{position:"fixed",top:0,left:0,right:0,background:"#2d7dd2",color:"#070d1f",textAlign:"center",padding:"6px",fontSize:".8rem",fontWeight:700,zIndex:200}}>Salvataggio…</div>}
     <div className="app">
       <div className="header">
-        <div className="logo">TT<span> Valdarno</span></div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}><img src="https://raw.githubusercontent.com/AlessandroChellini67/TTValdarno/main/d4w2I.jpg" style={{width:36,height:36,borderRadius:8,objectFit:"cover"}} alt="logo"/><div className="logo">TT<span> Valdarno</span></div></div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <div className="user-pill"><div className="dot"/>{currentUser.name}{currentUser.isAdmin&&<span style={{fontSize:".7rem",color:"#c9d11c"}}>★ Admin</span>}</div>
           <button className="btn-logout" onClick={handleLogout}>Esci</button>
@@ -291,8 +291,8 @@ function App(){
                   <span className="name">{getUserName(bk.player1)}</span>
                   {bk.player2?<><br/><span className="name">{getUserName(bk.player2)}</span></>
                   :bk.externalPartner?<><br/><span className="name">{bk.externalPartner}</span><br/><span style={{fontSize:".7rem",color:"#6b7c14"}}>Ospite esterno</span></>
-                  :bk.openInvite?<><br/><span style={{color:"#5c7a63"}}>Posto aperto</span></>
-                  :<><br/><span style={{color:"#5c7a63"}}>In attesa risposta</span></>}
+                  :bk.openInvite?<><br/><span style={{color:"#4a6a8a"}}>Posto aperto</span></>
+                  :<><br/><span style={{color:"#4a6a8a"}}>In attesa risposta</span></>}
                 </div>}
                 {state==="free"&&<button className="btn-book">+ Prenota</button>}
                 {canJoin&&<button className="btn-book" onClick={e=>{e.stopPropagation();handleJoin(bk);}}>Unisciti</button>}
@@ -315,7 +315,7 @@ function App(){
               <div className="info">
                 <strong>Tavolo {b.table} · {SLOTS[b.slot]}</strong>
                 {formatDate(d)}<br/>
-                {partnerName?<>Partner: <strong style={{color:"#e8f0eb"}}>{partnerName}</strong></>:b.openInvite?"Posto aperto":"In attesa risposta"}
+                {partnerName?<>Partner: <strong style={{color:"#e8f0ff"}}>{partnerName}</strong></>:b.openInvite?"Posto aperto":"In attesa risposta"}
                 <span style={{marginLeft:8}} className={`badge badge-${b.status==="confirmed"?"mine":"pending"}`}>{b.status==="confirmed"?"Confermata":"In attesa"}</span>
               </div>
               <button className="btn-danger" onClick={()=>handleCancel(b.id)}>Cancella</button>
@@ -333,19 +333,19 @@ function App(){
             return(
               <div key={u.id} className="booking-row" style={{flexDirection:"column",alignItems:"flex-start",gap:8}}>
                 <div style={{display:"flex",justifyContent:"space-between",width:"100%",alignItems:"center"}}>
-                  <strong style={{color:"#e8f0eb",fontSize:".95rem"}}>{u.name}</strong>
+                  <strong style={{color:"#e8f0ff",fontSize:".95rem"}}>{u.name}</strong>
                   {hasPlayed&&<span className="badge badge-mine" style={{fontSize:".7rem"}}>✓ Già giocato insieme</span>}
                 </div>
                 {futureBookings.length>0?(
-                  <div style={{fontSize:".78rem",color:"#5c7a63",width:"100%"}}>
-                    <div style={{marginBottom:4,color:"#9dbfa8",fontWeight:600}}>Prossimi allenamenti:</div>
+                  <div style={{fontSize:".78rem",color:"#4a6a8a",width:"100%"}}>
+                    <div style={{marginBottom:4,color:"#8ab0d4",fontWeight:600}}>Prossimi allenamenti:</div>
                     {futureBookings.slice(0,3).map(b=>(
-                      <div key={b.id} style={{padding:"4px 0",borderBottom:"1px solid #1a2b20"}}>
+                      <div key={b.id} style={{padding:"4px 0",borderBottom:"1px solid #0d1a35"}}>
                         🏓 Tavolo {b.table} · {SLOTS[b.slot]} · {new Date(b.date+"T12:00:00").toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"})}
                       </div>
                     ))}
                   </div>
-                ):<div style={{fontSize:".78rem",color:"#3a5040"}}>Nessun allenamento prenotato</div>}
+                ):<div style={{fontSize:".78rem",color:"#2a3d5a"}}>Nessun allenamento prenotato</div>}
               </div>
             );
           })}
@@ -396,7 +396,7 @@ function App(){
         </div>
         {inviteMode==="specific"&&<>
           <label>Scegli il partner</label>
-          <select value={inviteTarget} onChange={e=>setInviteTarget(e.target.value)} style={{width:"100%",background:"#0f1a14",border:"1px solid #2a3d2e",borderRadius:8,padding:"10px 12px",color:"#e8f0eb",fontSize:".9rem",marginBottom:14,outline:"none"}}>
+          <select value={inviteTarget} onChange={e=>setInviteTarget(e.target.value)} style={{width:"100%",background:"#070d1f",border:"1px solid #1a2d50",borderRadius:8,padding:"10px 12px",color:"#e8f0ff",fontSize:".9rem",marginBottom:14,outline:"none"}}>
             <option value="">— Seleziona —</option>
             {otherUsers.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
           </select>
@@ -404,7 +404,7 @@ function App(){
         </>}
         {inviteMode==="external"&&<>
           <label>Nome e cognome del giocatore esterno</label>
-          <input value={externalName} onChange={e=>setExternalName(e.target.value)} placeholder="Es. Marco Bianchi" style={{width:"100%",background:"#0f1a14",border:"1px solid #2a3d2e",borderRadius:8,padding:"10px 12px",color:"#e8f0eb",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
+          <input value={externalName} onChange={e=>setExternalName(e.target.value)} placeholder="Es. Marco Bianchi" style={{width:"100%",background:"#070d1f",border:"1px solid #1a2d50",borderRadius:8,padding:"10px 12px",color:"#e8f0ff",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
           <p style={{fontSize:".78rem",marginTop:-8}}>Il nome apparirà sul tavolo ma non verrà registrato nell'app.</p>
         </>}
         {inviteMode==="open"&&<p style={{fontSize:".78rem"}}>Il posto sarà visibile come aperto e chiunque potrà unirsi.</p>}
