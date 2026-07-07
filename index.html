@@ -115,7 +115,10 @@ async function fetchData(){
   return j.record;
 }
 async function saveData(d){
-  await fetch(BASE_URL,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":API_KEY},body:JSON.stringify(d)});
+  const r=await fetch(BASE_URL,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":API_KEY,"X-Bin-Versioning":"false"},body:JSON.stringify(d)});
+  const j=await r.json();
+  console.log("Save response:",JSON.stringify(j));
+  return j;
 }
 function getUpcomingDates(){
   const dates=[];const today=new Date();today.setHours(0,0,0,0);
