@@ -159,12 +159,14 @@ function App(){
     fetchData().then(d=>{
       if(!d.users)d.users=[];
       if(!d.bookings)d.bookings=[];
+      // Rimuovi duplicati per id
+      const seen=new Set();
+      d.users=d.users.filter(u=>{if(seen.has(u.id))return false;seen.add(u.id);return true;});
       if(!d.users.find(u=>u.id===DEFAULT_ADMIN.id)){
         d.users=[DEFAULT_ADMIN,...d.users];
         saveData(d);
       }
       setData(d);
-      // Aggiorna currentUser con i dati freschi da JSONBin
       const cu=localStorage.getItem("tt_currentUser");
       if(cu){
         const cuObj=JSON.parse(cu);
