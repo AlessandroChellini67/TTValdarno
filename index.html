@@ -210,9 +210,11 @@ function App(){
     if(!editName.trim())return;
     const updatedUser={...currentUser,name:editName.trim(),photo:editPhoto||currentUser.photo||null};
     const newUsers=users.map(u=>u.id===currentUser.id?updatedUser:u);
-    await updateData({...data,users:newUsers});
+    const newData={...data,users:newUsers};
+    await updateData(newData);
     localStorage.setItem("tt_currentUser",JSON.stringify(updatedUser));
     setCurrentUser(updatedUser);
+    setData(newData);
     setProfileModal(false);
   };
   const getBooking=(t,d,s)=>bookings.find(b=>b.table===t&&b.date===d&&b.slot===s);
