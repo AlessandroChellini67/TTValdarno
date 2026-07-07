@@ -163,7 +163,18 @@ function App(){
         d.users=[DEFAULT_ADMIN,...d.users];
         saveData(d);
       }
-      setData(d);setLoading(false);
+      setData(d);
+      // Aggiorna currentUser con i dati freschi da JSONBin
+      const cu=localStorage.getItem("tt_currentUser");
+      if(cu){
+        const cuObj=JSON.parse(cu);
+        const freshUser=d.users.find(u=>u.id===cuObj.id);
+        if(freshUser){
+          localStorage.setItem("tt_currentUser",JSON.stringify(freshUser));
+          setCurrentUser(freshUser);
+        }
+      }
+      setLoading(false);
     }).catch(()=>setLoading(false));
   },[]);
 
@@ -195,10 +206,12 @@ function App(){
   const handleSaveProfile=async()=>{
     if(!editName.trim())return;
     const updatedUser={...currentUser,name:editName.trim()};
-    const nd={...data,users:users.map(u=>u.id===currentUser.id?updatedUser:u)};
-    await updateData(nd);
+    const newUsers=users.map(u=>u.id===currentUser.id?updatedUser:u);
+    const nd={...data,users:newUsers};
+    setData(nd);
     localStorage.setItem("tt_currentUser",JSON.stringify(updatedUser));
     setCurrentUser(updatedUser);
+    await saveData(nd);
     setProfileModal(false);
   };
 
