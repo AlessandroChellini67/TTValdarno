@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TT Valdarno</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#070d1f;color:#e8f0ff;min-height:100vh}
+.app{max-width:960px;margin:0 auto;padding:0 16px 80px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid #121e3d}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:#2d7dd2;letter-spacing:.5px}
+.logo span{color:#e8f0ff}
+.user-pill{display:flex;align-items:center;gap:10px;background:#0d1a35;border-radius:999px;padding:6px 14px 6px 10px;font-size:.82rem;color:#8ab0d4}
+.dot{width:8px;height:8px;border-radius:50%;background:#2d7dd2}
+.btn-logout{background:none;border:1px solid #1a2d50;color:#8ab0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer}
+.btn-logout:hover{border-color:#2d7dd2;color:#2d7dd2}
+.tabs{display:flex;gap:4px;padding:16px 0 0}
+.tab{background:none;border:none;padding:8px 18px;border-radius:8px 8px 0 0;font-size:.88rem;font-weight:600;color:#4a6a8a;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#2d7dd2;border-bottom-color:#2d7dd2}
+.date-strip{display:flex;gap:8px;overflow-x:auto;padding:16px 0 8px;scrollbar-width:none}
+.date-strip::-webkit-scrollbar{display:none}
+.date-btn{flex-shrink:0;background:#0d1a35;border:1px solid #1a2d50;border-radius:10px;padding:8px 14px;cursor:pointer;text-align:center}
+.date-btn .day-name{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:#4a6a8a;font-weight:600}
+.date-btn .day-num{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:#8ab0d4;line-height:1.1}
+.date-btn.active{background:#2d7dd2;border-color:#2d7dd2}
+.date-btn.active .day-name,.date-btn.active .day-num{color:#070d1f}
+.slot-toggle{display:flex;gap:8px;margin:12px 0}
+.slot-btn{flex:1;padding:10px;border:1px solid #1a2d50;border-radius:8px;background:#0d1a35;color:#4a6a8a;font-size:.88rem;font-weight:600;cursor:pointer}
+.slot-btn.active{background:#0d2a4d;border-color:#2d7dd2;color:#2d7dd2}
+.table-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:8px}
+.table-card{border-radius:14px;padding:18px 16px;border:1.5px solid #1a2d50;transition:all .2s;position:relative}
+.table-card.free{background:#070d1f;border-color:#1a3d7a;cursor:pointer}
+.table-card.free:hover{border-color:#2d7dd2;transform:translateY(-2px);box-shadow:0 8px 24px #2d7dd222}
+.table-card.pending{background:#1a2208;border-color:#6b7c14}
+.table-card.full{background:#1a0e0e;border-color:#5c2a2a}
+.table-card.mine{background:#0a1535;border-color:#2a7a9d}
+.table-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
+.table-card.free .table-num{color:#2d7dd2}
+.table-card.pending .table-num{color:#c9d11c}
+.table-card.full .table-num{color:#de4c4c}
+.table-card.mine .table-num{color:#4cbdde}
+.table-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
+.table-card.free .table-label{color:#1a5fa0}
+.table-card.pending .table-label{color:#8a8a1a}
+.table-card.full .table-label{color:#8a3a3a}
+.table-card.mine .table-label{color:#2a7a9d}
+.table-players{font-size:.8rem;color:#8ab0d4;line-height:1.4}
+.table-players .name{font-weight:600;color:#e8f0ff}
+.btn-book{margin-top:10px;width:100%;background:#2d7dd2;color:#070d1f;border:none;border-radius:8px;padding:8px;font-size:.82rem;font-weight:700;cursor:pointer}
+.btn-cancel{margin-top:10px;width:100%;background:none;color:#de4c4c;border:1px solid #5c2a2a;border-radius:8px;padding:8px;font-size:.82rem;font-weight:700;cursor:pointer}
+.overlay{position:fixed;inset:0;background:#00000099;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal{background:#0d1530;border:1px solid #1a2d50;border-radius:18px;padding:28px 24px;width:100%;max-width:420px}
+.modal h2{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#2d7dd2;margin-bottom:16px}
+.modal p{font-size:.88rem;color:#8ab0d4;margin-bottom:16px}
+.modal label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#4a6a8a;margin-bottom:6px}
+.modal-actions{display:flex;gap:8px;margin-top:4px}
+.btn-primary{flex:1;background:#2d7dd2;color:#070d1f;border:none;border-radius:10px;padding:12px;font-size:.9rem;font-weight:700;cursor:pointer}
+.btn-secondary{flex:1;background:none;color:#8ab0d4;border:1px solid #1a2d50;border-radius:10px;padding:12px;font-size:.9rem;font-weight:600;cursor:pointer}
+.auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.auth-card{background:#0d1530;border:1px solid #1a2d50;border-radius:18px;padding:28px 24px;width:100%;max-width:380px}
+.auth-card h2{font-size:1.1rem;font-weight:700;color:#e8f0ff;margin-bottom:20px}
+.field-label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#4a6a8a;margin-bottom:6px}
+.field-input{width:100%;background:#070d1f;border:1px solid #1a2d50;border-radius:8px;padding:10px 12px;color:#e8f0ff;font-size:.9rem;margin-bottom:14px;outline:none;font-family:'Inter',sans-serif}
+.error-msg{background:#2a0a0a;border:1px solid #5c2a2a;border-radius:8px;padding:10px 12px;font-size:.82rem;color:#de4c4c;margin-bottom:14px}
+.section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:#4a6a8a;font-weight:600;margin:20px 0 8px}
+.empty-state{text-align:center;padding:40px 20px;color:#2a3d5a;font-size:.9rem}
+.my-bookings-list{display:flex;flex-direction:column;gap:10px}
+.booking-row{background:#0d1530;border:1px solid #1a2d50;border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.booking-row .info{font-size:.82rem;color:#8ab0d4}
+.booking-row .info strong{color:#e8f0ff;display:block;font-size:.9rem}
+.admin-section{margin-top:20px}
+.admin-section h3{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;color:#2d7dd2;margin-bottom:12px}
+.admin-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.admin-table th{text-align:left;padding:8px 10px;color:#4a6a8a;font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #121e3d}
+.admin-table td{padding:10px;border-bottom:1px solid #0d1a35;color:#8ab0d4}
+.admin-table td strong{color:#e8f0ff}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:700}
+.badge-free{background:#0a1a3d;color:#2d7dd2}
+.badge-pending{background:#1a2208;color:#c9d11c}
+.badge-mine{background:#0a1535;color:#4cbdde}
+.btn-danger{background:none;border:1px solid #5c2a2a;color:#de4c4c;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer}
+.pending-badge{position:absolute;top:10px;right:10px;font-size:.65rem;font-weight:700;background:#6b7c14;color:#070d1f;border-radius:999px;padding:2px 7px}
+.loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#2d7dd2;font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback}=React;
+
+const BIN_ID="6a4ba2c3da38895dfe34fd25";
+const API_KEY="$2a$10$Dsd10Ss03WuXZKAwXqVyAO/82xnFc6gAy/Ulugmgdyp9h4ajp20aK";
+const BASE_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const TABLES=[1,2,3,4,5];
+const SLOTS=["17:00–18:30","18:30–20:00"];
+const ADMIN_CODE="TTV";
+const DEFAULT_ADMIN={id:"admin-alessandro",name:"Alessandro",email:"alessandro.chellini7@gmail.com",password:"Tacchino",isAdmin:true};
+
+async function fetchData(){
+  const r=await fetch(BASE_URL+"/latest",{headers:{"X-Master-Key":API_KEY}});
+  const j=await r.json();
+  return j.record;
+}
+
+async function saveData(data){
+  await fetch(BASE_URL,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":API_KEY},body:JSON.stringify(data)});
+}
+
+function getUpcomingDates(){
+  const dates=[];const today=new Date();today.setHours(0,0,0,0);
+  let d=new Date(today);
+  while(dates.length<12){const dow=d.getDay();if(dow===1||dow===3||dow===5)dates.push(new Date(d));d.setDate(d.getDate()+1);}
+  return dates;
+}
+function formatDate(date){return date.toLocaleDateString("it-IT",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});}
+function dateKey(date){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+
+function App(){
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [saving,setSaving]=useState(false);
+  const [currentUser,setCurrentUser]=useState(null);
+  const [tab,setTab]=useState("prenota");
+  const [selectedDate,setSelectedDate]=useState(0);
+  const [selectedSlot,setSelectedSlot]=useState(0);
+  const [modal,setModal]=useState(null);
+  const [inviteMode,setInviteMode]=useState("open");
+  const [inviteTarget,setInviteTarget]=useState("");
+  const [externalName,setExternalName]=useState("");
+  const [authMode,setAuthMode]=useState("login");
+  const [form,setForm]=useState({name:"",email:"",password:"",adminCode:""});
+  const [authError,setAuthError]=useState("");
+  const dates=getUpcomingDates();
+
+  useEffect(()=>{
+    const cu=localStorage.getItem("tt_currentUser");
+    if(cu)setCurrentUser(JSON.parse(cu));
+    fetchData().then(d=>{
+      if(!d.users)d.users=[];
+      if(!d.bookings)d.bookings=[];
+      if(!d.users.find(u=>u.id===DEFAULT_ADMIN.id)){
+        d.users=[DEFAULT_ADMIN,...d.users];
+        saveData(d);
+      }
+      setData(d);
+      setLoading(false);
+    }).catch(()=>setLoading(false));
+  },[]);
+
+  const updateData=async(newData)=>{
+    setSaving(true);
+    setData(newData);
+    await saveData(newData);
+    setSaving(false);
+  };
+
+  const users=data?.users||[];
+  const bookings=data?.bookings||[];
+
+  const handleAuth=async()=>{
+    setAuthError("");
+    if(authMode==="register"){
+      if(!form.name.trim()||!form.email.trim()||!form.password.trim()){setAuthError("Compila tutti i campi.");return;}
+      if(users.find(u=>u.email===form.email.trim().toLowerCase())){setAuthError("Email già registrata.");return;}
+      const isAdmin=form.adminCode===ADMIN_CODE;
+      const newUser={id:Date.now().toString(),name:form.name.trim(),email:form.email.trim().toLowerCase(),password:form.password,isAdmin};
+      const newData={...data,users:[...users,newUser]};
+      await updateData(newData);
+      localStorage.setItem("tt_currentUser",JSON.stringify(newUser));
+      setCurrentUser(newUser);
+    }else{
+      const found=users.find(u=>u.email===form.email.trim().toLowerCase()&&u.password===form.password);
+      if(!found){setAuthError("Email o password errati.");return;}
+      localStorage.setItem("tt_currentUser",JSON.stringify(found));
+      setCurrentUser(found);
+    }
+  };
+
+  const handleLogout=()=>{localStorage.removeItem("tt_currentUser");setCurrentUser(null);setTab("prenota");};
+  const getBooking=(t,d,s)=>bookings.find(b=>b.table===t&&b.date===d&&b.slot===s);
+  const getUserName=id=>{if(!id)return null;const u=users.find(x=>x.id===id);return u?u.name:"Utente";};
+
+  const handleBook=async()=>{
+    const dateStr=dateKey(dates[selectedDate]);
+    if(getBooking(modal.tableNum,dateStr,selectedSlot))return;
+    const nb={id:Date.now().toString(),table:modal.tableNum,date:dateStr,slot:selectedSlot,player1:currentUser.id,player2:inviteMode==="specific"&&inviteTarget?inviteTarget:null,externalPartner:inviteMode==="external"&&externalName.trim()?externalName.trim():null,status:inviteMode==="external"&&externalName.trim()?"confirmed":"pending",openInvite:inviteMode==="open"};
+    await updateData({...data,bookings:[...bookings,nb]});
+    setModal(null);setInviteMode("open");setInviteTarget("");setExternalName("");
+  };
+
+  const handleJoin=async(bk)=>{
+    const newBookings=bookings.map(b=>b.id===bk.id?{...b,player2:currentUser.id,status:"confirmed",openInvite:false}:b);
+    await updateData({...data,bookings:newBookings});
+  };
+
+  const handleCancel=async(bookingId)=>{
+    const b=bookings.find(x=>x.id===bookingId);if(!b)return;
+    let newBookings;
+    if(b.player2===currentUser.id){newBookings=bookings.map(x=>x.id===bookingId?{...x,player2:null,status:"pending",openInvite:true}:x);}
+    else{newBookings=bookings.filter(x=>x.id!==bookingId);}
+    await updateData({...data,bookings:newBookings});
+  };
+
+  if(loading)return <div className="loading">Caricamento…</div>;
+
+  if(!currentUser){
+    return(
+      <div className="auth-wrap">
+        <img src="https://raw.githubusercontent.com/AlessandroChellini67/TTValdarno/main/d4w2I.jpg" style={{width:180,borderRadius:16,marginBottom:24,boxShadow:"0 8px 32px #2d7dd244"}} alt="TT Valdarno"/>
+        <div style={{fontSize:".88rem",color:"#4a6a8a",marginBottom:32,textAlign:"center"}}>Prenotazioni tavoli — Tennistavolo</div>
+        <div className="auth-card">
+          <h2>{authMode==="login"?"Accedi":"Registrati"}</h2>
+          {authError&&<div className="error-msg">{authError}</div>}
+          {authMode==="register"&&<><label className="field-label">Nome</label><input className="field-input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Mario Rossi"/></>}
+          <label className="field-label">Email</label>
+          <input className="field-input" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} placeholder="mario@email.com"/>
+          <label className="field-label">Password</label>
+          <input className="field-input" type="password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}/>
+          {authMode==="register"&&<><label className="field-label">Codice admin (opzionale)</label><input className="field-input" value={form.adminCode} onChange={e=>setForm(f=>({...f,adminCode:e.target.value}))} placeholder="Solo se sei il gestore"/></>}
+          <button className="btn-primary" style={{width:"100%",marginTop:4}} onClick={handleAuth}>{authMode==="login"?"Entra":"Crea account"}</button>
+          <div style={{textAlign:"center",marginTop:16,fontSize:".82rem",color:"#4a6a8a"}}>
+            {authMode==="login"?"Non hai un account? ":"Hai già un account? "}
+            <button onClick={()=>setAuthMode(authMode==="login"?"register":"login")} style={{background:"none",border:"none",color:"#2d7dd2",fontSize:".82rem",fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>
+              {authMode==="login"?"Registrati":"Accedi"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const dateStr=dateKey(dates[selectedDate]);
+  const otherUsers=users.filter(u=>u.id!==currentUser.id);
+  const myBookings=bookings.filter(b=>b.player1===currentUser.id||b.player2===currentUser.id);
+
+  return(
+    <>
+    {saving&&<div style={{position:"fixed",top:0,left:0,right:0,background:"#2d7dd2",color:"#070d1f",textAlign:"center",padding:"6px",fontSize:".8rem",fontWeight:700,zIndex:200}}>Salvataggio…</div>}
+    <div className="app">
+      <div className="header">
+        <div style={{display:"flex",alignItems:"center",gap:10}}><img src="https://raw.githubusercontent.com/AlessandroChellini67/TTValdarno/main/d4w2I.jpg" style={{width:36,height:36,borderRadius:8,objectFit:"cover"}} alt="logo"/><div className="logo">TT<span> Valdarno</span></div></div>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div className="user-pill"><div className="dot"/>{currentUser.name}{currentUser.isAdmin&&<span style={{fontSize:".7rem",color:"#c9d11c"}}>★ Admin</span>}</div>
+          <button className="btn-logout" onClick={handleLogout}>Esci</button>
+        </div>
+      </div>
+      <div className="tabs">
+        <button className={`tab ${tab==="prenota"?"active":""}`} onClick={()=>setTab("prenota")}>Prenota</button>
+        <button className={`tab ${tab==="miei"?"active":""}`} onClick={()=>setTab("miei")}>Le mie</button>
+        <button className={`tab ${tab==="giocatori"?"active":""}`} onClick={()=>setTab("giocatori")}>Giocatori</button>
+        {currentUser.isAdmin&&<button className={`tab ${tab==="admin"?"active":""}`} onClick={()=>setTab("admin")}>Admin</button>}
+      </div>
+
+      {tab==="prenota"&&<>
+        <div className="date-strip">
+          {dates.map((d,i)=>(
+            <button key={i} className={`date-btn ${selectedDate===i?"active":""}`} onClick={()=>setSelectedDate(i)}>
+              <div className="day-name">{d.toLocaleDateString("it-IT",{weekday:"short"})}</div>
+              <div className="day-num">{d.getDate()}/{d.getMonth()+1}</div>
+            </button>
+          ))}
+        </div>
+        <div className="slot-toggle">
+          {SLOTS.map((s,i)=><button key={i} className={`slot-btn ${selectedSlot===i?"active":""}`} onClick={()=>setSelectedSlot(i)}>{s}</button>)}
+        </div>
+        <div className="section-title">Tavoli — {formatDate(dates[selectedDate])} — {SLOTS[selectedSlot]}</div>
+        <div className="table-grid">
+          {TABLES.map(tableNum=>{
+            const bk=getBooking(tableNum,dateStr,selectedSlot);
+            const isMine=bk&&(bk.player1===currentUser.id||bk.player2===currentUser.id);
+            const canJoin=bk&&bk.status==="pending"&&bk.openInvite&&!isMine;
+            let state="free";
+            if(bk){if(isMine)state="mine";else if(bk.status==="confirmed")state="full";else state="pending";}
+            const labels={free:"Libero",pending:"In attesa",full:"Occupato",mine:"Mia prenotaz."};
+            return(
+              <div key={tableNum} className={`table-card ${state}`} onClick={state==="free"?()=>setModal({tableNum}):undefined}>
+                {state==="pending"&&<div className="pending-badge">1/2</div>}
+                <div className="table-num">{tableNum}</div>
+                <div className="table-label">Tavolo {tableNum} · {labels[state]}</div>
+                {bk&&<div className="table-players">
+                  <span className="name">{getUserName(bk.player1)}</span>
+                  {bk.player2?<><br/><span className="name">{getUserName(bk.player2)}</span></>
+                  :bk.externalPartner?<><br/><span className="name">{bk.externalPartner}</span><br/><span style={{fontSize:".7rem",color:"#6b7c14"}}>Ospite esterno</span></>
+                  :bk.openInvite?<><br/><span style={{color:"#4a6a8a"}}>Posto aperto</span></>
+                  :<><br/><span style={{color:"#4a6a8a"}}>In attesa risposta</span></>}
+                </div>}
+                {state==="free"&&<button className="btn-book">+ Prenota</button>}
+                {canJoin&&<button className="btn-book" onClick={e=>{e.stopPropagation();handleJoin(bk);}}>Unisciti</button>}
+                {isMine&&<button className="btn-cancel" onClick={e=>{e.stopPropagation();handleCancel(bk.id);}}>Cancella</button>}
+              </div>
+            );
+          })}
+        </div>
+      </>}
+
+      {tab==="miei"&&<div className="admin-section">
+        <h3>Le mie prenotazioni</h3>
+        {myBookings.length===0?<div className="empty-state">Nessuna prenotazione ancora.</div>:
+        <div className="my-bookings-list">
+          {myBookings.map(b=>{
+            const d=new Date(b.date+"T12:00:00");
+            const partner=b.player1===currentUser.id?b.player2:b.player1;
+            const partnerName=b.externalPartner||(partner?getUserName(partner):null);
+            return(<div key={b.id} className="booking-row">
+              <div className="info">
+                <strong>Tavolo {b.table} · {SLOTS[b.slot]}</strong>
+                {formatDate(d)}<br/>
+                {partnerName?<>Partner: <strong style={{color:"#e8f0ff"}}>{partnerName}</strong></>:b.openInvite?"Posto aperto":"In attesa risposta"}
+                <span style={{marginLeft:8}} className={`badge badge-${b.status==="confirmed"?"mine":"pending"}`}>{b.status==="confirmed"?"Confermata":"In attesa"}</span>
+              </div>
+              <button className="btn-danger" onClick={()=>handleCancel(b.id)}>Cancella</button>
+            </div>);
+          })}
+        </div>}
+      </div>}
+
+      {tab==="giocatori"&&<div className="admin-section">
+        <h3>Giocatori</h3>
+        <div className="my-bookings-list">
+          {otherUsers.filter(u=>!u.isAdmin).map(u=>{
+            const hasPlayed=bookings.some(b=>b.status==="confirmed"&&((b.player1===currentUser.id&&b.player2===u.id)||(b.player2===currentUser.id&&b.player1===u.id)));
+            const futureBookings=bookings.filter(b=>(b.player1===u.id||b.player2===u.id)&&new Date(b.date+"T23:59:00")>=new Date());
+            return(
+              <div key={u.id} className="booking-row" style={{flexDirection:"column",alignItems:"flex-start",gap:8}}>
+                <div style={{display:"flex",justifyContent:"space-between",width:"100%",alignItems:"center"}}>
+                  <strong style={{color:"#e8f0ff",fontSize:".95rem"}}>{u.name}</strong>
+                  {hasPlayed&&<span className="badge badge-mine" style={{fontSize:".7rem"}}>✓ Già giocato insieme</span>}
+                </div>
+                {futureBookings.length>0?(
+                  <div style={{fontSize:".78rem",color:"#4a6a8a",width:"100%"}}>
+                    <div style={{marginBottom:4,color:"#8ab0d4",fontWeight:600}}>Prossimi allenamenti:</div>
+                    {futureBookings.slice(0,3).map(b=>(
+                      <div key={b.id} style={{padding:"4px 0",borderBottom:"1px solid #0d1a35"}}>
+                        🏓 Tavolo {b.table} · {SLOTS[b.slot]} · {new Date(b.date+"T12:00:00").toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"})}
+                      </div>
+                    ))}
+                  </div>
+                ):<div style={{fontSize:".78rem",color:"#2a3d5a"}}>Nessun allenamento prenotato</div>}
+              </div>
+            );
+          })}
+          {otherUsers.filter(u=>!u.isAdmin).length===0&&<div className="empty-state">Nessun altro membro ancora.</div>}
+        </div>
+      </div>}
+
+      {tab==="admin"&&currentUser.isAdmin&&<div className="admin-section">
+        <h3>Pannello Admin</h3>
+        <div className="section-title" style={{marginTop:0}}>Utenti ({users.length})</div>
+        <table className="admin-table">
+          <thead><tr><th>Nome</th><th>Email</th><th>Ruolo</th><th></th></tr></thead>
+          <tbody>{users.map(u=>(
+            <tr key={u.id}>
+              <td><strong>{u.name}</strong></td><td>{u.email}</td>
+              <td><span className={`badge badge-${u.isAdmin?"mine":"free"}`}>{u.isAdmin?"Admin":"Membro"}</span></td>
+              <td>{u.id!==currentUser.id&&<button className="btn-danger" onClick={async()=>{const newData={...data,users:users.filter(x=>x.id!==u.id),bookings:bookings.filter(b=>b.player1!==u.id&&b.player2!==u.id)};await updateData(newData);}}>Rimuovi</button>}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+        <div className="section-title">Prenotazioni ({bookings.length})</div>
+        {bookings.length===0?<div className="empty-state">Nessuna prenotazione.</div>:
+        <table className="admin-table">
+          <thead><tr><th>Tavolo</th><th>Data</th><th>Turno</th><th>Giocatori</th><th>Stato</th><th></th></tr></thead>
+          <tbody>{[...bookings].sort((a,b)=>a.date.localeCompare(b.date)).map(b=>(
+            <tr key={b.id}>
+              <td><strong>{b.table}</strong></td>
+              <td>{new Date(b.date+"T12:00:00").toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}</td>
+              <td>{SLOTS[b.slot]}</td>
+              <td>{getUserName(b.player1)}{b.externalPartner?" · "+b.externalPartner:b.player2?" · "+getUserName(b.player2):" · —"}</td>
+              <td><span className={`badge badge-${b.status==="confirmed"?"mine":"pending"}`}>{b.status==="confirmed"?"Confermata":"In attesa"}</span></td>
+              <td><button className="btn-danger" onClick={async()=>{await updateData({...data,bookings:bookings.filter(x=>x.id!==b.id)});}}>Cancella</button></td>
+            </tr>
+          ))}</tbody>
+        </table>}
+      </div>}
+    </div>
+
+    {modal&&<div className="overlay" onClick={()=>setModal(null)}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h2>Prenota Tavolo {modal.tableNum}</h2>
+        <p>{formatDate(dates[selectedDate])} · {SLOTS[selectedSlot]}</p>
+        <label>Come vuoi giocare?</label>
+        <div className="slot-toggle" style={{marginBottom:14,flexWrap:"wrap"}}>
+          <button className={`slot-btn ${inviteMode==="open"?"active":""}`} onClick={()=>setInviteMode("open")}>Posto aperto</button>
+          <button className={`slot-btn ${inviteMode==="specific"?"active":""}`} onClick={()=>setInviteMode("specific")}>Invita qualcuno</button>
+          <button className={`slot-btn ${inviteMode==="external"?"active":""}`} onClick={()=>setInviteMode("external")} style={{marginTop:8}}>Giocatore esterno</button>
+        </div>
+        {inviteMode==="specific"&&<>
+          <label>Scegli il partner</label>
+          <select value={inviteTarget} onChange={e=>setInviteTarget(e.target.value)} style={{width:"100%",background:"#070d1f",border:"1px solid #1a2d50",borderRadius:8,padding:"10px 12px",color:"#e8f0ff",fontSize:".9rem",marginBottom:14,outline:"none"}}>
+            <option value="">— Seleziona —</option>
+            {otherUsers.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
+          </select>
+          <p style={{fontSize:".78rem",marginTop:-8}}>Il tavolo resterà "In attesa" finché il partner non si unisce.</p>
+        </>}
+        {inviteMode==="external"&&<>
+          <label>Nome e cognome del giocatore esterno</label>
+          <input value={externalName} onChange={e=>setExternalName(e.target.value)} placeholder="Es. Marco Bianchi" style={{width:"100%",background:"#070d1f",border:"1px solid #1a2d50",borderRadius:8,padding:"10px 12px",color:"#e8f0ff",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
+          <p style={{fontSize:".78rem",marginTop:-8}}>Il nome apparirà sul tavolo ma non verrà registrato nell'app.</p>
+        </>}
+        {inviteMode==="open"&&<p style={{fontSize:".78rem"}}>Il posto sarà visibile come aperto e chiunque potrà unirsi.</p>}
+        <div className="modal-actions">
+          <button className="btn-secondary" onClick={()=>setModal(null)}>Annulla</button>
+          <button className="btn-primary" onClick={handleBook} disabled={(inviteMode==="specific"&&!inviteTarget)||(inviteMode==="external"&&!externalName.trim())}>Conferma</button>
+        </div>
+      </div>
+    </div>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
