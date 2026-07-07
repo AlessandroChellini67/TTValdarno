@@ -199,17 +199,9 @@ function App(){
 
   const handleLogout=()=>{localStorage.removeItem("tt_currentUser");setCurrentUser(null);setTab("prenota");};
 
-  const handlePhotoUpload=(e)=>{
-    const file=e.target.files[0];
-    if(!file)return;
-    const reader=new FileReader();
-    reader.onload=(ev)=>setEditPhoto(ev.target.result);
-    reader.readAsDataURL(file);
-  };
-
   const handleSaveProfile=async()=>{
     if(!editName.trim())return;
-    const updatedUser={...currentUser,name:editName.trim(),photo:editPhoto||currentUser.photo||null};
+    const updatedUser={...currentUser,name:editName.trim()};
     const newUsers=users.map(u=>u.id===currentUser.id?updatedUser:u);
     const newData={...data,users:newUsers};
     await updateData(newData);
@@ -281,8 +273,8 @@ function App(){
       <div className="header">
         <div style={{display:"flex",alignItems:"center",gap:10}}><img src="https://raw.githubusercontent.com/AlessandroChellini67/TTValdarno/main/d4w2I.jpg" style={{width:36,height:36,borderRadius:8,objectFit:"cover"}} alt="logo"/><div className="logo">TT<span> Valdarno</span></div></div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <div className="user-pill" onClick={()=>{setEditName(currentUser.name);setEditPhoto(currentUser.photo||"");setProfileModal(true);}} style={{cursor:"pointer"}}>
-            {currentUser.photo?<img src={currentUser.photo} style={{width:24,height:24,borderRadius:"50%",objectFit:"cover"}}/>:<div className="dot"/>}
+          <div className="user-pill" onClick={()=>{setEditName(currentUser.name);setProfileModal(true);}} style={{cursor:"pointer"}}>
+            <div className="dot"/>
             {currentUser.name}{currentUser.isAdmin&&<span style={{fontSize:".7rem",color:"#c9d11c"}}>★ Admin</span>}
             <span style={{fontSize:".7rem",color:"#4a6a8a"}}>✏️</span>
           </div>
@@ -369,7 +361,7 @@ function App(){
               <div key={u.id} className="booking-row" style={{flexDirection:"column",alignItems:"flex-start",gap:8}}>
                 <div style={{display:"flex",justifyContent:"space-between",width:"100%",alignItems:"center"}}>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    {u.photo?<img src={u.photo} style={{width:32,height:32,borderRadius:"50%",objectFit:"cover"}}/>:<div style={{width:32,height:32,borderRadius:"50%",background:"#1a2d50",display:"flex",alignItems:"center",justifyContent:"center",color:"#2d7dd2",fontWeight:700,fontSize:".9rem"}}>{u.name[0].toUpperCase()}</div>}
+                    <div style={{width:32,height:32,borderRadius:"50%",background:"#1a2d50",display:"flex",alignItems:"center",justifyContent:"center",color:"#2d7dd2",fontWeight:700,fontSize:".9rem"}}>{u.name[0].toUpperCase()}</div>
                     <strong style={{color:"#e8f0ff",fontSize:".95rem"}}>{u.name}{u.id===currentUser.id&&<span style={{fontSize:".7rem",color:"#4a6a8a",marginLeft:4}}>(tu)</span>}</strong>
                   </div>
                   {hasPlayed&&u.id!==currentUser.id&&<span className="badge badge-mine" style={{fontSize:".7rem"}}>✓ Già giocato insieme</span>}
@@ -436,27 +428,7 @@ function App(){
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <h2>Il tuo profilo</h2>
 
-        <div style={{textAlign:"center",marginBottom:16}}>
-          {(editPhoto||currentUser.photo)?
-            <img src={editPhoto||currentUser.photo} style={{width:80,height:80,borderRadius:"50%",objectFit:"cover",border:"3px solid #2d7dd2"}}/>
-            :<div style={{width:80,height:80,borderRadius:"50%",background:"#1a2d50",display:"flex",alignItems:"center",justifyContent:"center",color:"#2d7dd2",fontWeight:800,fontSize:"2rem",margin:"0 auto",border:"3px solid #2d7dd2"}}>{currentUser.name[0].toUpperCase()}</div>
-          }
-          <div style={{marginTop:10}}>
-            <label style={{background:"#2d7dd2",color:"#070d1f",padding:"6px 14px",borderRadius:8,fontSize:".82rem",fontWeight:700,cursor:"pointer"}}>
-              📷 Cambia foto
-              <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{display:"none"}}/>
-            </label>
-            {(editPhoto||currentUser.photo)&&<button onClick={()=>setEditPhoto("")} style={{marginLeft:8,background:"none",border:"1px solid #5c2a2a",color:"#de4c4c",borderRadius:8,padding:"6px 10px",fontSize:".78rem",cursor:"pointer"}}>Rimuovi</button>}
-          </div>
-        </div>
-        <label className="field-label" style={{color:"#4a6a8a"}}>Nome</label>
-        <input value={editName} onChange={e=>setEditName(e.target.value)} style={{width:"100%",background:"#070d1f",border:"1px solid #1a2d50",borderRadius:8,padding:"10px 12px",color:"#e8f0ff",fontSize:".9rem",marginBottom:14,outline:"none",fontFamily:"Inter,sans-serif"}}/>
-        <div className="modal-actions">
-          <button className="btn-secondary" onClick={()=>setProfileModal(false)}>Annulla</button>
-          <button className="btn-primary" onClick={handleSaveProfile} disabled={!editName.trim()}>Salva</button>
-        </div>
-      </div>
-    </div>}
+        }
 
     {modal&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
